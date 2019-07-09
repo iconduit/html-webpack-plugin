@@ -44,7 +44,7 @@ module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
       const childCompiler = compilation.createChildCompiler(childCompilerName, outputOptions)
       childCompiler.context = context
 
-      const loaderPath = require.resolve('./loader/iconduit-tag-object-loader.js')
+      const loaderPath = require.resolve('./loader.js')
       const loaderQuery = JSON.stringify({publicPath})
 
       const entryPlugin = new SingleEntryPlugin(
