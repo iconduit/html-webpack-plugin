@@ -1,5 +1,6 @@
 const {resolve, relative} = require('path')
 
+const HtmlPlugin = require('html-webpack-plugin')
 const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin')
 const validateOptions = require('schema-utils')
 const {renderTag} = require('@iconduit/consumer')
@@ -94,15 +95,29 @@ module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
     }
 
     function handleCompilation (compilation) {
-      compilation.hooks.htmlWebpackPluginAlterAssetTags.tapPromise(PLUGIN_NAME, handleAssetTags)
+      if (HtmlPlugin.getHooks) {
+        HtmlPlugin.getHooks(compilation).alterAssetTagGroups.tapPromise(PLUGIN_NAME, handleAlterAssetTagGroups)
+      } else if (compilation.hooks.htmlWebpackPluginAlterAssetTags) {
+        compilation.hooks.htmlWebpackPluginAlterAssetTags.tapPromise(PLUGIN_NAME, handleAlterAssetTags)
+      } else {
+        throw new Error('Unable to hook into html-webpack-plugin')
+      }
     }
 
-    async function handleAssetTags (data) {
+    async function handleAlterAssetTags (data) {
       const {head, plugin} = data
 
       if (htmlPlugin && plugin !== htmlPlugin) return
 
       head.push(...result.map(translateTag))
+    }
+
+    async function handleAlterAssetTagGroups (data) {
+      const {headTags, plugin} = data
+
+      if (htmlPlugin && plugin !== htmlPlugin) return
+
+      headTags.push(...result.map(translateTag))
     }
 
     async function handleEmit (compilation) {
@@ -136,7 +151,7 @@ function translateTag (data) {
   return {
     attributes,
     innerHTML: children.map(renderTag).join(''),
-    selfClosingTag: isSelfClosing,
     tagName: tag,
+    voidTag: isSelfClosing,
   }
 }
