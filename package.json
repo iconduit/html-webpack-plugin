@@ -16,7 +16,7 @@
     "node": ">=10"
   },
   "peerDependencies": {
-    "html-webpack-plugin": "^3 || ^4-beta",
+    "html-webpack-plugin": "^3 || ^4.0.0-beta",
     "webpack": "^4"
   },
   "dependencies": {
