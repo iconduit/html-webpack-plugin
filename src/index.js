@@ -24,6 +24,10 @@ const optionsSchema = {
       description: 'An Iconduit consumer instance',
       type: 'object',
     },
+    htmlPlugin: {
+      description: 'The instance of html-webpack-plugin to add assets to',
+      type: 'object',
+    },
     manifestPath: {
       description: 'A path to the Iconduit manifest',
       type: 'string',
@@ -38,6 +42,7 @@ module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
   validateOptions(optionsSchema, options, 'iconduit-webpack-plugin')
 
   const manifestPath = determineManifestPath(options)
+  const {htmlPlugin} = options
 
   this.apply = compiler => {
     const {context} = compiler
@@ -93,7 +98,9 @@ module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
     }
 
     async function handleAssetTags (data) {
-      const {head} = data
+      const {head, plugin} = data
+
+      if (htmlPlugin && plugin !== htmlPlugin) return
 
       head.push(...result.map(translateTag))
     }
