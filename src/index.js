@@ -11,8 +11,19 @@ const optionsSchema = {
   description: 'The configuration for an instance of the Iconduit Webpack HTML plugin',
   type: 'object',
   additionalProperties: false,
-  required: ['manifestPath'],
+  oneOf: [
+    {
+      required: ['consumer'],
+    },
+    {
+      required: ['manifestPath'],
+    },
+  ],
   properties: {
+    consumer: {
+      description: 'An Iconduit consumer instance',
+      type: 'object',
+    },
     manifestPath: {
       description: 'A path to the Iconduit manifest',
       type: 'string',
@@ -24,11 +35,11 @@ const optionsSchema = {
 const PLUGIN_NAME = 'IconduitWebpackHtmlPlugin'
 
 module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
-  const {manifestPath} = options
+  validateOptions(optionsSchema, options, 'iconduit-webpack-plugin')
+
+  const manifestPath = determineManifestPath(options)
 
   this.apply = compiler => {
-    validateOptions(optionsSchema, options, 'iconduit-webpack-plugin')
-
     const {context} = compiler
     const childCompilerName = buildChildCompilerName(context, manifestPath)
     let outputName, result
@@ -91,6 +102,12 @@ module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
       delete compilation.assets[outputName]
     }
   }
+}
+
+function determineManifestPath (options) {
+  const {consumer, manifestPath} = options
+
+  return manifestPath || consumer.absoluteDocumentPath('iconduitManifest')
 }
 
 function buildChildCompilerName (context, manifestPath) {
