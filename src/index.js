@@ -107,17 +107,21 @@ module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
     async function handleAlterAssetTags (data) {
       const {head, plugin} = data
 
-      if (htmlPlugin && plugin !== htmlPlugin) return
+      if (htmlPlugin && plugin !== htmlPlugin) return data
 
       head.push(...result.map(translateTag))
+
+      return data
     }
 
     async function handleAlterAssetTagGroups (data) {
       const {headTags, plugin} = data
 
-      if (htmlPlugin && plugin !== htmlPlugin) return
+      if (htmlPlugin && plugin !== htmlPlugin) return data
 
       headTags.push(...result.map(translateTag))
+
+      return data
     }
 
     async function handleEmit (compilation) {
