@@ -30,7 +30,10 @@ module.exports = function iconduitTagObjectLoader (source) {
 
 async function main (loader, source) {
   const options = getOptions(loader)
-  validateOptions(optionsSchema, options, 'iconduit-webpack-plugin loader')
+  validateOptions(optionsSchema, options, {
+    baseDataPath: 'options',
+    name: 'iconduit-webpack-plugin loader',
+  })
 
   const publicPath = determinePublicPath(options)
 

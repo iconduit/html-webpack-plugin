@@ -40,7 +40,10 @@ const optionsSchema = {
 const PLUGIN_NAME = 'IconduitWebpackHtmlPlugin'
 
 module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
-  validateOptions(optionsSchema, options, 'iconduit-webpack-plugin')
+  validateOptions(optionsSchema, options, {
+    baseDataPath: 'options',
+    name: 'iconduit-webpack-plugin',
+  })
 
   const manifestPath = determineManifestPath(options)
   const {htmlPlugin} = options
