@@ -5,8 +5,8 @@ const {getOptions, urlToRequest} = require('loader-utils')
 const optionsSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   $id: 'https://iconduit.github.io/schema/webpack-html-plugin-loader.schema.json',
-  title: 'Iconduit Webpack HTML plugin loader configuration',
-  description: "The configuration for an instance of the Iconduit Webpack HTML plugin's internal loader",
+  title: 'Iconduit Webpack HTML plugin loader options',
+  description: "The options for an instance of the Iconduit Webpack HTML plugin's internal loader",
   type: 'object',
   additionalProperties: false,
   required: ['publicPath'],

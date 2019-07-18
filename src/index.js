@@ -8,8 +8,8 @@ const {renderTag} = require('@iconduit/consumer')
 const optionsSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   $id: 'https://iconduit.github.io/schema/webpack-html-plugin.schema.json',
-  title: 'Iconduit Webpack HTML plugin configuration',
-  description: 'The configuration for an instance of the Iconduit Webpack HTML plugin',
+  title: 'Iconduit Webpack HTML plugin options',
+  description: 'The options for an instance of the Iconduit Webpack HTML plugin',
   type: 'object',
   additionalProperties: false,
   oneOf: [
