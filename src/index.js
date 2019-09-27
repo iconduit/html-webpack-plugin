@@ -21,6 +21,10 @@ const optionsSchema = {
     },
   ],
   properties: {
+    chunkName: {
+      description: 'The chunk name to use',
+      type: 'string',
+    },
     consumer: {
       description: 'An Iconduit consumer instance',
       type: 'object',
@@ -46,11 +50,15 @@ module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
   })
 
   const manifestPath = determineManifestPath(options)
-  const {htmlPlugin} = options
+
+  const {
+    chunkName = 'iconduit-webpack-plugin',
+    htmlPlugin,
+  } = options
 
   this.apply = compiler => {
     const {context} = compiler
-    const childCompilerName = buildChildCompilerName(context, manifestPath)
+    const childCompilerName = buildChildCompilerName(context, chunkName, manifestPath)
     let outputName, result
 
     compiler.hooks.make.tapPromise(PLUGIN_NAME, handleMake)
@@ -70,7 +78,7 @@ module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
       const entryPlugin = new SingleEntryPlugin(
         context,
         `!!${loaderPath}?${loaderQuery}!${manifestPath}`,
-        'iconduit-webpack-plugin',
+        chunkName,
       )
       entryPlugin.apply(childCompiler)
 
@@ -139,7 +147,9 @@ function determineManifestPath (options) {
   return manifestPath || consumer.absoluteDocumentPath('iconduitManifest')
 }
 
-function buildChildCompilerName (context, manifestPath) {
+function buildChildCompilerName (context, chunkName, manifestPath) {
+  if (chunkName) return `iconduit-webpack-plugin for ${chunkName}`
+
   const absolutePath = resolve(context, manifestPath)
   const relativePath = relative(context, absolutePath)
   const shortestPath = absolutePath.length < relativePath.length ? absolutePath : relativePath
