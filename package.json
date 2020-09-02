@@ -16,22 +16,20 @@
     "node": ">=10"
   },
   "peerDependencies": {
-    "html-webpack-plugin": "^3 || ^4.0.0-beta",
+    "html-webpack-plugin": "^4",
     "webpack": "^4"
   },
   "dependencies": {
     "@iconduit/consumer": "^0.1.17",
-    "loader-utils": "^1.2.3",
+    "loader-utils": "^2.0.0",
     "schema-utils": "^2.0.0"
   },
   "devDependencies": {
-    "eslint": "^6.0.1",
-    "eslint-config-standard": "^13.0.1",
+    "eslint": "^7.8.1",
+    "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-node": "^9.0.1",
+    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.1.1",
-    "eslint-plugin-standard": "^4.0.0",
-    "html-webpack-plugin": "^4.0.0-beta.8",
-    "webpack": "^4.35.3"
+    "eslint-plugin-standard": "^4.0.0"
   }
 }
