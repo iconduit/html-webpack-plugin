@@ -20,34 +20,18 @@
     "webpack": "^4"
   },
   "dependencies": {
-    "@iconduit/consumer": "^0.1.16",
+    "@iconduit/consumer": "^0.1.17",
     "loader-utils": "^1.2.3",
     "schema-utils": "^2.0.0"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "chai-as-promised": "^7.1.1",
-    "dirty-chai": "^2.0.1",
     "eslint": "^6.0.1",
     "eslint-config-standard": "^13.0.1",
     "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-mocha": "^6.0.0",
     "eslint-plugin-node": "^9.0.1",
     "eslint-plugin-promise": "^4.1.1",
     "eslint-plugin-standard": "^4.0.0",
     "html-webpack-plugin": "^4.0.0-beta.8",
-    "mocha": "^6.0.2",
-    "nyc": "^14.0.0",
-    "sinon": "^7.3.1",
-    "sinon-chai": "^3.3.0",
     "webpack": "^4.35.3"
-  },
-  "scripts": {
-    "ci-lint": "eslint .",
-    "coverage": "nyc mocha 'test/suite/**/*.spec.js'",
-    "coverage-open": "open artifacts/tests/coverage/html/index.html",
-    "lint": "eslint --fix .",
-    "pre-commit": "yarn test && yarn ci-lint",
-    "test": "mocha 'test/suite/**/*.spec.js'"
   }
 }
