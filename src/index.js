@@ -1,8 +1,7 @@
 const {resolve, relative} = require('path')
 
 const HtmlPlugin = require('html-webpack-plugin')
-const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin')
-const validateOptions = require('schema-utils')
+const {validate} = require('schema-utils')
 const {renderTag} = require('@iconduit/consumer')
 
 const optionsSchema = {
@@ -12,22 +11,11 @@ const optionsSchema = {
   description: 'The options for an instance of the Iconduit Webpack HTML plugin',
   type: 'object',
   additionalProperties: false,
-  oneOf: [
-    {
-      required: ['consumer'],
-    },
-    {
-      required: ['manifestPath'],
-    },
-  ],
+  required: ['manifestPath'],
   properties: {
     chunkName: {
       description: 'The chunk name to use',
       type: 'string',
-    },
-    consumer: {
-      description: 'An Iconduit consumer instance',
-      type: 'object',
     },
     htmlPlugin: {
       description: 'The instance of html-webpack-plugin to add assets to',
@@ -44,12 +32,16 @@ const optionsSchema = {
 const PLUGIN_NAME = 'IconduitWebpackHtmlPlugin'
 
 module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
-  validateOptions(optionsSchema, options, {
+  validate(optionsSchema, options, {
     baseDataPath: 'options',
-    name: 'iconduit-webpack-plugin',
+    name: 'IconduitWebpackHtmlPlugin',
   })
 
-  const manifestPath = determineManifestPath(options)
+  const {manifestPath} = options
+
+  const browserConfigLoaderPath = require.resolve('./loader/browser-config.js')
+  const iconduitManifestLoaderPath = require.resolve('./loader/iconduit-manifest.js')
+  const webManifestLoaderPath = require.resolve('./loader/web-manifest.js')
 
   const {
     chunkName = 'iconduit-webpack-plugin',
@@ -57,30 +49,35 @@ module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
   } = options
 
   this.apply = compiler => {
-    const {context} = compiler
+    const {context, webpack} = compiler
+    const {Compilation, EntryPlugin} = webpack
+    const {PROCESS_ASSETS_STAGE_OPTIMIZE} = Compilation
     const childCompilerName = buildChildCompilerName(context, chunkName, manifestPath)
-    let outputName, result
+    let result
 
     compiler.hooks.make.tapPromise(PLUGIN_NAME, handleMake)
-    compiler.hooks.emit.tapPromise(PLUGIN_NAME, handleEmit)
-    compiler.hooks.compilation.tap(PLUGIN_NAME, handleCompilation)
 
     async function handleMake (compilation) {
-      const {outputOptions: {publicPath}} = compilation
+      if (HtmlPlugin.getHooks) {
+        HtmlPlugin.getHooks(compilation).alterAssetTagGroups.tapPromise(PLUGIN_NAME, handleAlterAssetTagGroups)
+      } else {
+        throw new Error('Unable to hook into html-webpack-plugin')
+      }
+
+      const {outputOptions: {publicPath: optionsPublicPath}} = compilation
+      const publicPath = optionsPublicPath === 'auto' ? '' : optionsPublicPath
       const outputOptions = {filename: '[name]', publicPath}
 
       const childCompiler = compilation.createChildCompiler(childCompilerName, outputOptions)
       childCompiler.context = context
 
-      const loaderPath = require.resolve('./loader.js')
-      const loaderQuery = JSON.stringify({publicPath})
-
-      const entryPlugin = new SingleEntryPlugin(
+      const iconduitManifestLoaderQuery = JSON.stringify({browserConfigLoaderPath, publicPath, webManifestLoaderPath})
+      const loadIconduitManifest = new EntryPlugin(
         context,
-        `!!${loaderPath}?${loaderQuery}!${manifestPath}`,
+        `!!${iconduitManifestLoaderPath}?${iconduitManifestLoaderQuery}!${manifestPath}`,
         chunkName,
       )
-      entryPlugin.apply(childCompiler)
+      loadIconduitManifest.apply(childCompiler)
 
       const [entries, childCompilation] = await new Promise((resolve, reject) => {
         childCompiler.runAsChild((error, ...args) => {
@@ -88,10 +85,17 @@ module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
         })
       })
 
-      outputName = compilation.mainTemplate.hooks.assetPath.call(outputOptions.filename, {
+      const outputName = compilation.hooks.assetPath.call(outputOptions.filename, {
         hash: childCompilation.hash,
         chunk: entries[0],
       })
+
+      compilation.hooks.processAssets.tap(
+        {name: PLUGIN_NAME, stage: PROCESS_ASSETS_STAGE_OPTIMIZE},
+        assets => {
+          delete assets[outputName]
+        },
+      )
 
       if (childCompilation.errors.length > 0) {
         const errorDetails = childCompilation.errors
@@ -101,28 +105,10 @@ module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
         throw new Error(`Child compilation failed:\n${errorDetails}`)
       }
 
-      result = eval(childCompilation.assets[outputName].source()) // eslint-disable-line no-eval
-      childCompilation.assets = []
-    }
+      const source = childCompilation.assets[outputName].source()
+      const evalSource = new Function(`let __iconduit_result; ${source}; return __iconduit_result`) // eslint-disable-line no-new-func
 
-    function handleCompilation (compilation) {
-      if (HtmlPlugin.getHooks) {
-        HtmlPlugin.getHooks(compilation).alterAssetTagGroups.tapPromise(PLUGIN_NAME, handleAlterAssetTagGroups)
-      } else if (compilation.hooks.htmlWebpackPluginAlterAssetTags) {
-        compilation.hooks.htmlWebpackPluginAlterAssetTags.tapPromise(PLUGIN_NAME, handleAlterAssetTags)
-      } else {
-        throw new Error('Unable to hook into html-webpack-plugin')
-      }
-    }
-
-    async function handleAlterAssetTags (data) {
-      const {head, plugin} = data
-
-      if (htmlPlugin && plugin !== htmlPlugin) return data
-
-      head.push(...result.map(translateTag))
-
-      return data
+      result = evalSource()
     }
 
     async function handleAlterAssetTagGroups (data) {
@@ -134,27 +120,17 @@ module.exports = function IconduitWebpackHtmlPlugin (options = {}) {
 
       return data
     }
-
-    async function handleEmit (compilation) {
-      delete compilation.assets[outputName]
-    }
   }
 }
 
-function determineManifestPath (options) {
-  const {consumer, manifestPath} = options
-
-  return manifestPath || consumer.absoluteDocumentPath('iconduitManifest')
-}
-
 function buildChildCompilerName (context, chunkName, manifestPath) {
-  if (chunkName) return `iconduit-webpack-plugin for ${chunkName}`
+  if (chunkName) return `IconduitWebpackHtmlPlugin for chunk ${chunkName}`
 
   const absolutePath = resolve(context, manifestPath)
   const relativePath = relative(context, absolutePath)
   const shortestPath = absolutePath.length < relativePath.length ? absolutePath : relativePath
 
-  return `iconduit-webpack-plugin for ${JSON.stringify(shortestPath)}`
+  return `IconduitWebpackHtmlPlugin for manifest ${JSON.stringify(shortestPath)}`
 }
 
 function translateTag (data) {

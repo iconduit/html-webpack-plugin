@@ -13,23 +13,26 @@
     "/src/"
   ],
   "engines": {
-    "node": ">=10"
+    "node": ">=12"
   },
   "peerDependencies": {
-    "html-webpack-plugin": "^4",
-    "webpack": "^4"
+    "html-webpack-plugin": "^5",
+    "webpack": "^5"
   },
   "dependencies": {
-    "@iconduit/consumer": "^0.1.17",
+    "@iconduit/consumer": "^0.4.1",
     "loader-utils": "^2.0.0",
-    "schema-utils": "^2.0.0"
+    "schema-utils": "^3.0.0",
+    "xml-js": "^1.6.11"
   },
   "devDependencies": {
     "eslint": "^7.8.1",
-    "eslint-config-standard": "^14.1.1",
+    "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.1.1",
-    "eslint-plugin-standard": "^4.0.0"
+    "eslint-plugin-promise": "^5.1.0",
+    "html-webpack-plugin": "^5.3.1",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.2"
   }
 }
