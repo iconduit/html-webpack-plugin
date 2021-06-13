@@ -19,9 +19,9 @@ async function main (loader, browserConfigXml) {
   const browserConfig = xml2js(browserConfigXml)
 
   const root = browserConfig.elements.find(({name}) => name === 'browserconfig')
-  const msapplication = root?.elements.find(({name}) => name === 'msapplication')
-  const tile = msapplication?.elements.find(({name}) => name === 'tile')
-  const tiles = tile?.elements.filter(({attributes: {src} = {}}) => Boolean(src))
+  const msapplication = root && root.elements.find(({name}) => name === 'msapplication')
+  const tile = msapplication && msapplication.elements.find(({name}) => name === 'tile')
+  const tiles = tile ? tile.elements.filter(({attributes: {src} = {}}) => Boolean(src)) : []
 
   await Promise.all(tiles.map(tile => resolveTile(resolve, tile)))
 

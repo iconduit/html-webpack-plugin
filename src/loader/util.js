@@ -25,8 +25,8 @@ function createResolve (loader) {
           let {assetModuleFilename, hashDigest, hashDigestLength, hashFunction} = loader._compilation.outputOptions
 
           // Why the fuck do I have to do this, Webpack!?
-          assetModuleFilename = assetModuleFilename.replaceAll(/\[ext\]/gi, '.[ext]')
-          assetModuleFilename = assetModuleFilename.replaceAll(
+          assetModuleFilename = assetModuleFilename.replace(/\[ext\]/gi, '.[ext]')
+          assetModuleFilename = assetModuleFilename.replace(
             /\[(?:([^:\]]+):)?(hash|contenthash)(?::([a-z]+\d*))?(?::(\d+))?\]/gi,
             (_, fn = hashFunction, type, digest = hashDigest, length = hashDigestLength) => {
               return `[${fn}:${type}:${digest}:${length}]`

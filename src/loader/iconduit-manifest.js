@@ -62,7 +62,7 @@ async function main (loader, manifestJson) {
     },
   })(definitions))
 
-  const source = resolvedDefinitions.replaceAll(/%REQUIRE%(.*?)%REQUIRE_END%/g, (_, request) => {
+  const source = resolvedDefinitions.replace(/%REQUIRE%(.*?)%REQUIRE_END%/g, (_, request) => {
     return `" + require(${JSON.stringify(request)}) + "`
   })
 
