@@ -22,7 +22,7 @@
   "dependencies": {
     "@iconduit/consumer": "^0.4.1",
     "loader-utils": "^2.0.0",
-    "schema-utils": "^3.0.0",
+    "schema-utils": "^4.0.0",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
