@@ -49,20 +49,28 @@ async function main(loader, manifestJson) {
 
       absoluteDocumentUrl(outputName) {
         let request = urlToRequest(consumer.documentPath(outputName));
-        if (outputName === "browserconfigXml")
+
+        if (outputName === "browserconfigXml") {
           request = `!!${browserConfigLoaderPath}!${request}`;
-        if (outputName === "webAppManifest")
+        }
+
+        if (outputName === "webAppManifest") {
           request = `!!${webManifestLoaderPath}!${request}`;
+        }
 
         return `${baseUrl}%REQUIRE%${request}%REQUIRE_END%`;
       },
 
       documentUrl(outputName) {
         let request = urlToRequest(consumer.documentPath(outputName));
-        if (outputName === "browserconfigXml")
+
+        if (outputName === "browserconfigXml") {
           request = `!!${browserConfigLoaderPath}!${request}`;
-        if (outputName === "webAppManifest")
+        }
+
+        if (outputName === "webAppManifest") {
           request = `!!${webManifestLoaderPath}!${request}`;
+        }
 
         return `%REQUIRE%${request}%REQUIRE_END%`;
       },
