@@ -1,37 +1,51 @@
-const {interpolateName} = require('loader-utils')
+const { interpolateName } = require("loader-utils");
 
 module.exports = {
   createResolve,
-}
+};
 
-function createResolve (loader) {
-  return function resolve (request) {
+function createResolve(loader) {
+  return function resolve(request) {
     return new Promise((resolve, reject) => {
       loader.resolve(loader.context, request, (error, inputFilePath) => {
         if (error) {
-          reject(error)
+          reject(error);
 
-          return
+          return;
         }
 
-        loader.addDependency(inputFilePath)
-        loader.loadModule(inputFilePath, (error, source, sourceMap, module) => {
+        loader.addDependency(inputFilePath);
+        loader.loadModule(inputFilePath, (error, source, sourceMap) => {
           if (error) {
-            reject(error)
+            reject(error);
 
-            return
+            return;
           }
 
-          let {assetModuleFilename, hashDigest, hashDigestLength, hashFunction} = loader._compilation.outputOptions
+          let {
+            assetModuleFilename,
+            hashDigest,
+            hashDigestLength,
+            hashFunction,
+          } = loader._compilation.outputOptions;
 
           // Why the fuck do I have to do this, Webpack!?
-          assetModuleFilename = assetModuleFilename.replace(/\[ext\]/gi, '.[ext]')
+          assetModuleFilename = assetModuleFilename.replace(
+            /\[ext\]/gi,
+            ".[ext]",
+          );
           assetModuleFilename = assetModuleFilename.replace(
             /\[(?:([^:\]]+):)?(hash|contenthash)(?::([a-z]+\d*))?(?::(\d+))?\]/gi,
-            (_, fn = hashFunction, type, digest = hashDigest, length = hashDigestLength) => {
-              return `[${fn}:${type}:${digest}:${length}]`
+            (
+              _,
+              fn = hashFunction,
+              type,
+              digest = hashDigest,
+              length = hashDigestLength,
+            ) => {
+              return `[${fn}:${type}:${digest}:${length}]`;
             },
-          )
+          );
 
           const outputFilePath = interpolateName(
             {
@@ -42,13 +56,13 @@ function createResolve (loader) {
               context: loader.context,
               content: source,
             },
-          )
+          );
 
-          loader.emitFile(outputFilePath, source, sourceMap)
+          loader.emitFile(outputFilePath, source, sourceMap);
 
-          resolve(outputFilePath)
-        })
-      })
-    })
-  }
+          resolve(outputFilePath);
+        });
+      });
+    });
+  };
 }

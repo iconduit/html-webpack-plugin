@@ -1,22 +1,35 @@
-const {createConsumer, createTagDefinitionResolver} = require('@iconduit/consumer')
-const {urlToRequest} = require('loader-utils')
+const {
+  createConsumer,
+  createTagDefinitionResolver,
+} = require("@iconduit/consumer");
+const { urlToRequest } = require("loader-utils");
 
-module.exports = function iconduitManifestLoader (manifestJson) {
-  const callback = this.async()
+module.exports = function iconduitManifestLoader(manifestJson) {
+  const callback = this.async();
 
-  main(this, manifestJson).then(
-    result => callback(null, result),
-    error => callback(error),
-  )
-}
+  main(this, manifestJson)
+    .then((result) => {
+      // eslint-disable-next-line promise/no-callback-in-promise
+      callback(null, result);
 
-async function main (loader, manifestJson) {
-  loader.cacheable()
-  const {browserConfigLoaderPath, publicPath, webManifestLoaderPath} = loader.getOptions()
+      return;
+    })
+    .catch((error) => {
+      // eslint-disable-next-line promise/no-callback-in-promise
+      callback(error);
+    });
+};
 
-  const manifest = JSON.parse(manifestJson)
-  const consumer = createConsumer(manifest)
-  const {manifest: {tag}} = consumer
+async function main(loader, manifestJson) {
+  loader.cacheable();
+  const { browserConfigLoaderPath, publicPath, webManifestLoaderPath } =
+    loader.getOptions();
+
+  const manifest = JSON.parse(manifestJson);
+  const consumer = createConsumer(manifest);
+  const {
+    manifest: { tag },
+  } = consumer;
 
   const definitions = [
     ...(tag.meta || []),
@@ -25,46 +38,55 @@ async function main (loader, manifestJson) {
     ...(tag.appleTouchStartup || []),
     ...(tag.graph || []),
     ...(tag.graphImage || []),
-  ]
+  ];
 
-  let baseUrl = manifest.urls.base
-  if (publicPath.startsWith('/')) baseUrl = baseUrl.replace(/\/$/, '')
+  let baseUrl = manifest.urls.base;
+  if (publicPath.startsWith("/")) baseUrl = baseUrl.replace(/\/$/, "");
 
-  const resolvedDefinitions = JSON.stringify(createTagDefinitionResolver({
-    ...consumer,
+  const resolvedDefinitions = JSON.stringify(
+    createTagDefinitionResolver({
+      ...consumer,
 
-    absoluteDocumentUrl (outputName) {
-      let request = urlToRequest(consumer.documentPath(outputName))
-      if (outputName === 'browserconfigXml') request = `!!${browserConfigLoaderPath}!${request}`
-      if (outputName === 'webAppManifest') request = `!!${webManifestLoaderPath}!${request}`
+      absoluteDocumentUrl(outputName) {
+        let request = urlToRequest(consumer.documentPath(outputName));
+        if (outputName === "browserconfigXml")
+          request = `!!${browserConfigLoaderPath}!${request}`;
+        if (outputName === "webAppManifest")
+          request = `!!${webManifestLoaderPath}!${request}`;
 
-      return `${baseUrl}%REQUIRE%${request}%REQUIRE_END%`
+        return `${baseUrl}%REQUIRE%${request}%REQUIRE_END%`;
+      },
+
+      documentUrl(outputName) {
+        let request = urlToRequest(consumer.documentPath(outputName));
+        if (outputName === "browserconfigXml")
+          request = `!!${browserConfigLoaderPath}!${request}`;
+        if (outputName === "webAppManifest")
+          request = `!!${webManifestLoaderPath}!${request}`;
+
+        return `%REQUIRE%${request}%REQUIRE_END%`;
+      },
+
+      absoluteImageUrl(outputName, sizeKey) {
+        const request = urlToRequest(consumer.imagePath(outputName, sizeKey));
+
+        return `${baseUrl}%REQUIRE%${request}%REQUIRE_END%`;
+      },
+
+      imageUrl(outputName, sizeKey) {
+        const request = urlToRequest(consumer.imagePath(outputName, sizeKey));
+
+        return `%REQUIRE%${request}%REQUIRE_END%`;
+      },
+    })(definitions),
+  );
+
+  const source = resolvedDefinitions.replace(
+    /%REQUIRE%(.*?)%REQUIRE_END%/g,
+    (_, request) => {
+      return `" + require(${JSON.stringify(request)}) + "`;
     },
+  );
 
-    documentUrl (outputName) {
-      let request = urlToRequest(consumer.documentPath(outputName))
-      if (outputName === 'browserconfigXml') request = `!!${browserConfigLoaderPath}!${request}`
-      if (outputName === 'webAppManifest') request = `!!${webManifestLoaderPath}!${request}`
-
-      return `%REQUIRE%${request}%REQUIRE_END%`
-    },
-
-    absoluteImageUrl (outputName, sizeKey) {
-      const request = urlToRequest(consumer.imagePath(outputName, sizeKey))
-
-      return `${baseUrl}%REQUIRE%${request}%REQUIRE_END%`
-    },
-
-    imageUrl (outputName, sizeKey) {
-      const request = urlToRequest(consumer.imagePath(outputName, sizeKey))
-
-      return `%REQUIRE%${request}%REQUIRE_END%`
-    },
-  })(definitions))
-
-  const source = resolvedDefinitions.replace(/%REQUIRE%(.*?)%REQUIRE_END%/g, (_, request) => {
-    return `" + require(${JSON.stringify(request)}) + "`
-  })
-
-  return `__iconduit_result = ${source}`
+  return `__iconduit_result = ${source}`;
 }
