@@ -4,3 +4,9 @@
 
 .makefiles/%:
 	@curl -sfL https://makefiles.dev/v1 | bash /dev/stdin "$@"
+
+################################################################################
+
+.PHONY: ci
+ci::
+	cd test/integration/simple; 	$(JS_EXEC) webpack
