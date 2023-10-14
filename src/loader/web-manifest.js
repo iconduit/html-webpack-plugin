@@ -1,5 +1,4 @@
 const { urlToRequest } = require("loader-utils");
-
 const { createResolve } = require("./util.js");
 
 module.exports = function webManifestLoader(manifestJson) {

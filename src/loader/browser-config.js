@@ -1,6 +1,5 @@
 const { urlToRequest } = require("loader-utils");
 const { js2xml, xml2js } = require("xml-js");
-
 const { createResolve } = require("./util.js");
 
 module.exports = function browserConfigLoader(browserConfigXml) {
