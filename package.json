@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "@iconduit/consumer": "^0.4.1",
-    "loader-utils": "^2.0.0",
-    "schema-utils": "^3.0.0",
+    "loader-utils": "^3.2.1",
+    "schema-utils": "^4.2.0",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
@@ -39,6 +39,6 @@
     "prettier": "^3.0.0",
     "prettier-plugin-organize-imports": "^3.2.3",
     "webpack": "^5.38.1",
-    "webpack-cli": "^4.7.2"
+    "webpack-cli": "^5.1.4"
   }
 }
