@@ -51,11 +51,11 @@ async function main(loader, manifestJson) {
         let request = urlToRequest(consumer.documentPath(outputName));
 
         if (outputName === "browserconfigXml") {
-          request = `!!${browserConfigLoaderPath}!${request}`;
+          request = `${request}!=!${browserConfigLoaderPath}`;
         }
 
         if (outputName === "webAppManifest") {
-          request = `!!${webManifestLoaderPath}!${request}`;
+          request = `${request}!=!${webManifestLoaderPath}`;
         }
 
         return `${baseUrl}%REQUIRE%${request}%REQUIRE_END%`;
@@ -65,11 +65,11 @@ async function main(loader, manifestJson) {
         let request = urlToRequest(consumer.documentPath(outputName));
 
         if (outputName === "browserconfigXml") {
-          request = `!!${browserConfigLoaderPath}!${request}`;
+          request = `${request}!=!${browserConfigLoaderPath}`;
         }
 
         if (outputName === "webAppManifest") {
-          request = `!!${webManifestLoaderPath}!${request}`;
+          request = `${request}!=!${webManifestLoaderPath}`;
         }
 
         return `%REQUIRE%${request}%REQUIRE_END%`;
