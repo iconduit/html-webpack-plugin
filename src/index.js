@@ -129,7 +129,7 @@ module.exports = function IconduitWebpackHtmlPlugin(options = {}) {
       const source = childCompilation.assets[outputName].source();
       const evalSource = new Function(
         `let __iconduit_result; ${source}; return __iconduit_result`,
-      ); // eslint-disable-line no-new-func
+      );
 
       result = evalSource();
     }
