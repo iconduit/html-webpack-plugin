@@ -9,4 +9,4 @@
 
 .PHONY: ci
 ci::
-	cd test/integration/simple; $(JS_EXEC) webpack
+	cd test/integration/simple; $(JS_EXEC) webpack && jq -e . dist/*.webmanifest
