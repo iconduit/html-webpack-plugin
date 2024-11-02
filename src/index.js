@@ -39,7 +39,7 @@ module.exports = function IconduitWebpackHtmlPlugin(options = {}) {
   });
 
   const { manifestPath } = options;
-  const loaderPath = require.resolve("./loader/iconduit-manifest.js");
+  const loaderPath = require.resolve("./loader.js");
   const { chunkName = "iconduit-webpack-plugin", htmlPlugin } = options;
 
   this.apply = (compiler) => {
