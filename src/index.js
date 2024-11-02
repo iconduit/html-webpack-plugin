@@ -39,13 +39,7 @@ module.exports = function IconduitWebpackHtmlPlugin(options = {}) {
   });
 
   const { manifestPath } = options;
-
-  const browserConfigLoaderPath = require.resolve("./loader/browser-config.js");
-  const iconduitManifestLoaderPath = require.resolve(
-    "./loader/iconduit-manifest.js",
-  );
-  const webManifestLoaderPath = require.resolve("./loader/web-manifest.js");
-
+  const loaderPath = require.resolve("./loader/iconduit-manifest.js");
   const { chunkName = "iconduit-webpack-plugin", htmlPlugin } = options;
 
   this.apply = (compiler) => {
@@ -83,14 +77,10 @@ module.exports = function IconduitWebpackHtmlPlugin(options = {}) {
       );
       childCompiler.context = context;
 
-      const iconduitManifestLoaderQuery = JSON.stringify({
-        browserConfigLoaderPath,
-        publicPath,
-        webManifestLoaderPath,
-      });
+      const loaderQuery = JSON.stringify({ publicPath });
       const loadIconduitManifest = new EntryPlugin(
         context,
-        `!!${iconduitManifestLoaderPath}?${iconduitManifestLoaderQuery}!${manifestPath}`,
+        `!!${loaderPath}?${loaderQuery}!${manifestPath}`,
         chunkName,
       );
       loadIconduitManifest.apply(childCompiler);

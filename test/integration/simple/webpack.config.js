@@ -12,8 +12,18 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(png|svg|xml|webmanifest)$/,
+        test: /\.(png|svg|xml)$/,
         type: "asset/resource",
+      },
+      {
+        test: /\/browserconfig\.xml$/i,
+        type: 'asset/resource',
+        use: "@iconduit/browserconfig-loader",
+      },
+      {
+        test: /\.webmanifest$/i,
+        type: 'asset/resource',
+        use: "@iconduit/webmanifest-loader",
       },
     ],
   },

@@ -22,8 +22,7 @@ module.exports = function iconduitManifestLoader(manifestJson) {
 
 async function main(loader, manifestJson) {
   loader.cacheable();
-  const { browserConfigLoaderPath, publicPath, webManifestLoaderPath } =
-    loader.getOptions();
+  const { publicPath } = loader.getOptions();
 
   const manifest = JSON.parse(manifestJson);
   const consumer = createConsumer(manifest);
@@ -48,29 +47,13 @@ async function main(loader, manifestJson) {
       ...consumer,
 
       absoluteDocumentUrl(outputName) {
-        let request = urlToRequest(consumer.documentPath(outputName));
-
-        if (outputName === "browserconfigXml") {
-          request = `${request}!=!${browserConfigLoaderPath}`;
-        }
-
-        if (outputName === "webAppManifest") {
-          request = `${request}!=!${webManifestLoaderPath}`;
-        }
+        const request = urlToRequest(consumer.documentPath(outputName));
 
         return `${baseUrl}%REQUIRE%${request}%REQUIRE_END%`;
       },
 
       documentUrl(outputName) {
-        let request = urlToRequest(consumer.documentPath(outputName));
-
-        if (outputName === "browserconfigXml") {
-          request = `${request}!=!${browserConfigLoaderPath}`;
-        }
-
-        if (outputName === "webAppManifest") {
-          request = `${request}!=!${webManifestLoaderPath}`;
-        }
+        const request = urlToRequest(consumer.documentPath(outputName));
 
         return `%REQUIRE%${request}%REQUIRE_END%`;
       },
