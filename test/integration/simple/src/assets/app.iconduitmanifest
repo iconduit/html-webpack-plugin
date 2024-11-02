@@ -81,9 +81,9 @@
         "url": "iconduit.consumer.js"
       },
       "iconduitManifest": {
-        "path": "site.iconduitmanifest",
+        "path": "app.iconduitmanifest",
         "type": "application/vnd.iconduit.manifest",
-        "url": "site.iconduitmanifest"
+        "url": "app.iconduitmanifest"
       },
       "indexHtml": {
         "path": "index.html",
@@ -101,9 +101,9 @@
         "url": "tags.html"
       },
       "webAppManifest": {
-        "path": "site.webmanifest",
+        "path": "app.webmanifest",
         "type": "application/manifest+json",
-        "url": "site.webmanifest"
+        "url": "app.webmanifest"
       }
     },
     "image": {

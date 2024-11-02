@@ -8,5 +8,7 @@
 ################################################################################
 
 .PHONY: ci
-ci::
-	cd test/integration/simple; $(JS_EXEC) webpack && jq -e . dist/*.webmanifest
+ci:: artifacts/link-dependencies.touch
+	@rm -rf test/integration/simple/dist
+	$(JS_EXEC) webpack --config test/integration/simple/webpack.config.js
+	jq -e . test/integration/simple/dist/app.webmanifest
