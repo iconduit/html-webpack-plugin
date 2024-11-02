@@ -7,8 +7,17 @@
 
 ################################################################################
 
+.PHONY: test
+test:: integrate
+
+.PHONY: precommit
+precommit:: integrate
+
 .PHONY: ci
-ci:: artifacts/link-dependencies.touch
+ci:: integrate
+
+.PHONY: integrate
+integrate: artifacts/link-dependencies.touch
 	@rm -rf test/integration/simple/dist
 	$(JS_EXEC) webpack --config test/integration/simple/webpack.config.js
 	jq -e . test/integration/simple/dist/app.webmanifest
