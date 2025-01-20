@@ -30,7 +30,7 @@
     "@iconduit/browserconfig-loader": "^0.2.0",
     "@iconduit/webmanifest-loader": "^0.3.0",
     "eslint": "^9.13.0",
-    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^17.0.0",
     "eslint-plugin-promise": "^7.0.0",
